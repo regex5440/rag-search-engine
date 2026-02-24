@@ -2,6 +2,7 @@
 import argparse
 import json
 import helpers
+from inverted_index import InvertedIndex
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
@@ -10,17 +11,20 @@ def main() -> None:
     search_parser = subparsers.add_parser("search", help="Search movies using BM25")
     search_parser.add_argument("query", type=str, help="Search query")
 
+    build_parser = subparsers.add_parser("build", help="Build movie indexing for fast searches")
+    
+
     args = parser.parse_args()
 
     
+    helpers.loadSaveWords()
+    data = {}
+    with open("data/movies.json") as f:
+        data = json.load(fp=f)
+        f.close()
     match args.command:
         case "search":
             print('Searching for:', args.query)
-            data = {}
-            helpers.loadSaveWords()
-            with open("data/movies.json") as f:
-                data = json.load(fp=f)
-                f.close()
             count = 0
 
             qTokens = helpers.tokenizeSearchTerm(args.query)
@@ -41,6 +45,10 @@ def main() -> None:
                         print(f'{count}. {movies["title"]}')
                         # print(movieTitleTokens)
                         break
+        case "build":
+            idx = InvertedIndex()
+            idx.build(data["movies"])
+            idx.save()
 
         case _:
             parser.print_help()
