@@ -4,7 +4,16 @@ translationTable = str.maketrans({
                 "!": None,
                 ",": None,
                 "'": None,
+                "\\": None,
                 "\"": None,
+                "/": None,
+                "(": None,
+                ")": None,
+                "-": " ",
+                ":": None,
+                ";": None,
+                "\n": None,
+                ".": None
             })
 
 stopWords = []
@@ -22,7 +31,7 @@ def tokenizeSearchTerm(q):
     sensitiveQuery = str(q).lower()
 
     # 2. Remove any punctuation
-    sensitiveQuery.translate(translationTable) 
+    sensitiveQuery = sensitiveQuery.translate(translationTable) 
 
     # 3. Tokenization
     __tokenizedQuery = sensitiveQuery.split(" ")
