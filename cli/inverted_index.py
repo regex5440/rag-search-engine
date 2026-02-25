@@ -1,4 +1,4 @@
-from pickle import dump
+from pickle import dump, load
 import os
 from helpers import tokenizeSearchTerm
 
@@ -6,6 +6,10 @@ class InvertedIndex():
     def __init__(self) -> None:
         self.index = {} # tokens: str -> set[int] of docIds
         self.docmap = {} # docId: int -> docObject
+        
+        self.__cacheLocation = os.path.join(os.getcwd(),"cache")
+        self.__indexFile = os.path.join(self.__cacheLocation, "index.pkl")
+        self.__docMapFile = os.path.join(self.__cacheLocation, "docmap.pkl")
 
     def __add_document(self, doc_id, text):
         for token in tokenizeSearchTerm(text):
@@ -17,7 +21,7 @@ class InvertedIndex():
         [token] = tokenizeSearchTerm(term)
         if token is None:
             return []
-        if token not in self.index[token]:
+        if token not in self.index:
             return []
         
         return sorted(self.index[token])
@@ -31,18 +35,25 @@ class InvertedIndex():
 
     def save(self):
         print("Saving Indexed data...")
-        cacheLocation = os.path.join(os.getcwd(),"cache")
-        os.makedirs(cacheLocation, exist_ok=True)
+        os.makedirs(self.__cacheLocation, exist_ok=True)
 
-        indexFile = os.path.join(cacheLocation, "index.pkl")
-        docMapFile = os.path.join(cacheLocation, "docmap.pkl")
-
-        with open(indexFile, "wb") as f:
+        with open(self.__indexFile, "wb") as f:
             dump(self.index, f)
             f.close()
-            print("Saved index to", indexFile)
-        with open(docMapFile, "wb") as f:
+            print("Saved index to", self.__indexFile)
+        with open(self.__docMapFile, "wb") as f:
             dump(self.docmap, f)
             f.close()
-            print("Saved movie mapping to", docMapFile)
+            print("Saved movie mapping to", self.__docMapFile)
 
+    def load(self):
+        if len(self.index) > 0 and len(self.docmap) > 0:
+            return
+        if not os.path.exists(self.__cacheLocation):
+            raise FileNotFoundError()
+        with open(self.__indexFile, "rb") as f:
+            self.index = load(f)
+            f.close()
+        with open(self.__docMapFile, "rb") as f:
+            self.docmap = load(f)
+            f.close()

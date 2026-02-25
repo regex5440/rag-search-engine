@@ -18,35 +18,34 @@ def main() -> None:
 
     
     helpers.loadSaveWords()
+    idx = InvertedIndex()
     data = {}
     with open("data/movies.json") as f:
         data = json.load(fp=f)
         f.close()
     match args.command:
         case "search":
-            print('Searching for:', args.query)
-            count = 0
-
             qTokens = helpers.tokenizeSearchTerm(args.query)
-            # Query matching logic
-            for movies in data["movies"]:
-                if count >=5:
-                    break
-                movieTitleTokens = helpers.tokenizeSearchTerm(movies["title"])
-                        
-                for token in qTokens:
-                    matchFound = False
-                    for movieToken in movieTitleTokens:
-                        if token in movieToken:
-                            matchFound = True
-                            break
-                    if matchFound:
-                        count+=1
-                        print(f'{count}. {movies["title"]}')
-                        # print(movieTitleTokens)
+            try:
+                idx.load()
+            except FileNotFoundError:
+                print("indexing does not exists")
+                return
+            print('Searching for:', args.query)
+            matchedIds = set()
+            for token in qTokens:
+                enough = False
+                for r in idx.get_documents(token):
+                    if len(matchedIds) >= 5:
+                        enough = True
                         break
+                    matchedIds.add(r)
+                if enough:
+                    break
+            for id in matchedIds:
+                movie = idx.docmap[id]
+                print(f'{id} {movie["title"]}')
         case "build":
-            idx = InvertedIndex()
             idx.build(data["movies"])
             idx.save()
 
