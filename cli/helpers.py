@@ -1,20 +1,7 @@
 from nltk.stem import PorterStemmer
+from string import punctuation
 
-translationTable = str.maketrans({
-                "!": None,
-                ",": None,
-                "'": None,
-                "\\": None,
-                "\"": None,
-                "/": None,
-                "(": None,
-                ")": None,
-                "-": " ",
-                ":": None,
-                ";": None,
-                "\n": None,
-                ".": None
-            })
+translationTable = str.maketrans("", "", punctuation)
 
 stopWords = []
 
@@ -34,10 +21,10 @@ def tokenizeSearchTerm(q):
     sensitiveQuery = sensitiveQuery.translate(translationTable) 
 
     # 3. Tokenization
-    __tokenizedQuery = sensitiveQuery.split(" ")
+    __tokenizedQuery = sensitiveQuery.split()
     queryTokens = []    
     for word in __tokenizedQuery:
-        if len(word) > 0 and word not in stopWords:   #4. Stop words
+        if word != None and len(word) > 0 and (word not in stopWords):   #4. Stop words
             queryTokens.append(word)
 
     # 5. Stemming
