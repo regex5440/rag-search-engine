@@ -2,20 +2,26 @@ from pickle import dump, load
 import os
 from helpers import tokenizeSearchTerm
 from collections import Counter
+from math import log
+import constants
 
 class InvertedIndex():
     def __init__(self) -> None:
-        self.index = {} # tokens: str -> set[int] of docIds
-        self.docmap = {} # docId: int -> docObject
+        self.index: dict[str, set[int]] = {} # tokens: str -> set[int] of docIds
+        self.docmap: dict[int, dict] = {} # docId: int -> docObject
         self.term_frequency: dict[int, Counter] = {} # docId -> Counter
+        self.doc_lengths = {}
         
-        self.__cacheLocation = os.path.join(os.getcwd(),"cache")
-        self.__indexFile = os.path.join(self.__cacheLocation, "index.pkl")
-        self.__docMapFile = os.path.join(self.__cacheLocation, "docmap.pkl")
-        self.__termFrequency = os.path.join(self.__cacheLocation, "term_frequencies.pkl")
+        self.__cacheLocation = os.path.join(os.getcwd(), constants.CACHE_FOLDER)
+        self.__indexFile = os.path.abspath(constants.INDEX_FILE)
+        self.__docMapFile = os.path.abspath(constants.DOCUMENT_OBJ_FILE)
+        self.__termFrequency = os.path.abspath(constants.TERM_FREQUENCY_FILE)
+        self.__docLengthFile = os.path.join(constants.DOC_LENGTH_FILE)
 
     def __add_document(self, doc_id, text):
-        for token in tokenizeSearchTerm(text):
+        tokens = tokenizeSearchTerm(text)
+        self.doc_lengths[doc_id] = len(tokens)
+        for token in tokens:
             if token not in self.index:
                 self.index[token] = set()
             self.index[token].add(doc_id)
@@ -63,6 +69,10 @@ class InvertedIndex():
             dump(self.term_frequency, f)
             f.close()
             print("Saved term frequencies to", self.__termFrequency)
+        with open(self.__docLengthFile, "wb") as f:
+            dump(self.doc_lengths, f)
+            f.close()
+            print("Saved doc length to", self.__docLengthFile)
 
     def load(self):
         if len(self.index) > 0 and len(self.docmap) > 0 and len(self.term_frequency) > 0:
@@ -78,3 +88,51 @@ class InvertedIndex():
         with open(self.__termFrequency, "rb") as f:
             self.term_frequency = load(f)
             f.close()
+        with open(self.__docLengthFile, "rb") as f:
+            self.doc_lengths = load(f)
+            f.close()
+    
+    def get_bm25_idf(self, term: str) -> float:
+        tokens = tokenizeSearchTerm(term)
+        if len(tokens) > 1:
+            raise Exception("only single term can be used")
+        N = len(self.docmap)
+        df = len(self.index[tokens[0]])
+        return log((N - df + 0.5)/(df + 0.5) + 1)
+
+    def get_bm25_tf(self, doc_id, term, k1=constants.BM25_K1, length_normalization_factor=constants.BM25_B):
+        docLen = self.doc_lengths[doc_id]
+        if docLen == None:
+            docLen = 0.0
+        leng_norm = 1 - length_normalization_factor + length_normalization_factor * (docLen/self.__get_avg_doc_length())
+        tf = self.get_tf(doc_id, term)
+        return (tf * (k1 + 1))/(tf + k1 * leng_norm)
+    
+    def __get_avg_doc_length(self) -> float:
+        sum = 0
+        for doc_len in self.doc_lengths.values():
+            sum += doc_len
+        
+        if sum == 0:
+            return 0.0
+        return sum/len(self.doc_lengths)
+    
+    def bm25(self, doc_id, term):
+        tf = self.get_bm25_tf(doc_id, term)
+        idf = self.get_bm25_idf(term)
+        return tf * idf
+    
+    def bm25_search(self, query, limit):
+        tokens = tokenizeSearchTerm(query)
+        if len(tokens) == 0:
+            return []
+        
+        matchingDocs = {}
+
+        for token in tokens:
+            for doc_id in self.index.get(token, []):
+                if doc_id not in matchingDocs:
+                    matchingDocs[doc_id] = 0
+                matchingDocs[doc_id] += self.bm25(doc_id, token)
+        
+        return sorted(matchingDocs.items(), key=lambda item: item[1], reverse=True)[:limit]

@@ -1,0 +1,37 @@
+import argparse
+import constants 
+
+def attachParser():
+    parser = argparse.ArgumentParser(description="Keyword Search CLI")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    search_parser = subparsers.add_parser("search", help="Search movies using BM25")
+    search_parser.add_argument("query", type=str, help="Search query")
+
+    subparsers.add_parser("build", help="Build movie indexing for fast searches")
+
+    tf = subparsers.add_parser("tf", help="Get term frequency in a document")
+    tf.add_argument("docId", type=int, help="Id of the document")
+    tf.add_argument("term", type=str, help="Term to be checked in document")
+    
+    idf = subparsers.add_parser("idf", help="Calculate the invert document frequency")
+    idf.add_argument("term", type=str, help="Term to be searched across dataset")
+
+    tfidf = subparsers.add_parser("tfidf", help="Get the best matching tf-idf")
+    tfidf.add_argument("docId", type=int, help="Id of the document")
+    tfidf.add_argument("term", type=str, help="Term to be checked in document")
+
+    bm25_idf_parser = subparsers.add_parser("bm25idf", help="Get BM25 IDF score for a given term")
+    bm25_idf_parser.add_argument("term", type=str, help="Term to get BM25 IDF score for")
+
+    bm25_tf_parser = subparsers.add_parser("bm25tf", help="Get BM25 TF score for a given document ID and term")
+    bm25_tf_parser.add_argument("doc_id", type=int, help="Document ID")
+    bm25_tf_parser.add_argument("term", type=str, help="Term to get BM25 TF score for")
+    bm25_tf_parser.add_argument("k1", type=float, nargs='?', default=constants.BM25_K1, help="Tunable BM25 K1 parameter")
+    bm25_tf_parser.add_argument("b", type=float, nargs='?', default=constants.BM25_B, help="Tunable BM25 b parameter")
+
+    bm25search_parser = subparsers.add_parser("bm25search", help="Search movies using full BM25 scoring")
+    bm25search_parser.add_argument("query", type=str, help="Search query")
+    bm25search_parser.add_argument("--limit", type=int, default=5, help="limit the search result, default 5")
+
+    return parser

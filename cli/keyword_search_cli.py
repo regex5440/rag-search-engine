@@ -1,29 +1,12 @@
 #!/usr/bin/env python3
-import argparse
 import json
 import helpers
 from inverted_index import InvertedIndex
 from math import log
+import cmd_parser
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Keyword Search CLI")
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    search_parser = subparsers.add_parser("search", help="Search movies using BM25")
-    search_parser.add_argument("query", type=str, help="Search query")
-
-    build_parser = subparsers.add_parser("build", help="Build movie indexing for fast searches")
-
-    tf = subparsers.add_parser("tf", help="Get term frequency in a document")
-    tf.add_argument("docId", type=int, help="Id of the document")
-    tf.add_argument("term", type=str, help="Term to be checked in document")
-    
-    idf = subparsers.add_parser("idf", help="Calculate the invert document frequency")
-    idf.add_argument("term", type=str, help="Term to be searched across dataset")
-
-    tfidf = subparsers.add_parser("tfidf", help="Get the best matching tf-idf")
-    tfidf.add_argument("docId", type=int, help="Id of the document")
-    tfidf.add_argument("term", type=str, help="Term to be checked in document")
+    parser = cmd_parser.attachParser()
 
     args = parser.parse_args()
 
@@ -75,6 +58,23 @@ def main() -> None:
             idf = log((len(idx.docmap) + 1)/(matchingDocsCount+1))
             tf_idf = tf*idf
             print(f"TF-IDF score of '{args.term}' in document '{args.docId}': {tf_idf:.2f}")
+        case "bm25idf":
+            idx.load()
+            bm25idf = idx.get_bm25_idf(args.term)
+            print(f"BM25 IDF score of '{args.term}': {bm25idf:.2f}")
+        case "bm25tf":
+            idx.load()
+            bm25tf = idx.get_bm25_tf(args.doc_id, args.term, args.k1)
+            print(f"BM25 TF score of '{args.term}' in document '{args.doc_id}': {bm25tf:.2f}")
+        case "bm25search":
+            idx.load()
+            result = idx.bm25_search(args.query, args.limit)
+            for i, [id, score] in enumerate(result):
+                movie = idx.docmap.get(id,{})
+                title = movie['title']
+                print(f"{i+1}. ({id}) {title} - Score: {score:.2f}")
+
+
         case _:
             parser.print_help()
 
