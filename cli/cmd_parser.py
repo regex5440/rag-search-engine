@@ -35,3 +35,23 @@ def attachParser():
     bm25search_parser.add_argument("--limit", type=int, default=5, help="limit the search result, default 5")
 
     return parser
+
+def semanticSearchParser():
+    parser = argparse.ArgumentParser(description="Semantic Search CLI")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    subparsers.add_parser("verify", help="Verify the model information")
+
+    embedding = subparsers.add_parser("embed_text", help="Get the embeddings of the provided text")
+    embedding.add_argument("text", type=str, help="text value to generate embeddings for")
+
+    subparsers.add_parser("verify_embeddings", help="Verify the movies embedding data")
+
+    embedQ = subparsers.add_parser("embedquery", help="get the embeddings for provided query")
+    embedQ.add_argument("query", type=str, help="string value to get the embedding vector for")
+
+    search = subparsers.add_parser("search", help="Perform semantic search")
+    search.add_argument("query", type=str, help="mandatory search query for semantic search")
+    search.add_argument("--limit", type=int, default=5, help="Limit the search results, default 5")
+
+    return parser

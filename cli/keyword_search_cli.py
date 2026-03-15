@@ -4,17 +4,16 @@ import helpers
 from inverted_index import InvertedIndex
 from math import log
 import cmd_parser
+from constants import MOVIES_DATA_FILE
 
 def main() -> None:
     parser = cmd_parser.attachParser()
-
     args = parser.parse_args()
-
     
     helpers.loadSaveWords()
     idx = InvertedIndex()
     data = {}
-    with open("data/movies.json") as f:
+    with open(MOVIES_DATA_FILE) as f:
         data = json.load(fp=f)
         f.close()
     match args.command:

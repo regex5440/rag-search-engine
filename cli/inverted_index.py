@@ -11,12 +11,6 @@ class InvertedIndex():
         self.docmap: dict[int, dict] = {} # docId: int -> docObject
         self.term_frequency: dict[int, Counter] = {} # docId -> Counter
         self.doc_lengths = {}
-        
-        self.__cacheLocation = os.path.join(os.getcwd(), constants.CACHE_FOLDER)
-        self.__indexFile = os.path.abspath(constants.INDEX_FILE)
-        self.__docMapFile = os.path.abspath(constants.DOCUMENT_OBJ_FILE)
-        self.__termFrequency = os.path.abspath(constants.TERM_FREQUENCY_FILE)
-        self.__docLengthFile = os.path.join(constants.DOC_LENGTH_FILE)
 
     def __add_document(self, doc_id, text):
         tokens = tokenizeSearchTerm(text)
@@ -55,40 +49,40 @@ class InvertedIndex():
 
     def save(self):
         print("Saving Indexed data...")
-        os.makedirs(self.__cacheLocation, exist_ok=True)
+        os.makedirs(constants.CACHE_FOLDER, exist_ok=True)
 
-        with open(self.__indexFile, "wb") as f:
+        with open(constants.INDEX_FILE, "wb") as f:
             dump(self.index, f)
             f.close()
-            print("Saved index to", self.__indexFile)
-        with open(self.__docMapFile, "wb") as f:
+            print("Saved index to", constants.INDEX_FILE)
+        with open(constants.DOCUMENT_OBJ_FILE, "wb") as f:
             dump(self.docmap, f)
             f.close()
-            print("Saved movie mapping to", self.__docMapFile)
-        with open(self.__termFrequency, "wb") as f:
+            print("Saved movie mapping to", constants.DOCUMENT_OBJ_FILE)
+        with open(constants.TERM_FREQUENCY_FILE, "wb") as f:
             dump(self.term_frequency, f)
             f.close()
-            print("Saved term frequencies to", self.__termFrequency)
-        with open(self.__docLengthFile, "wb") as f:
+            print("Saved term frequencies to", constants.TERM_FREQUENCY_FILE)
+        with open(constants.DOC_LENGTH_FILE, "wb") as f:
             dump(self.doc_lengths, f)
             f.close()
-            print("Saved doc length to", self.__docLengthFile)
+            print("Saved doc length to", constants.DOC_LENGTH_FILE)
 
     def load(self):
         if len(self.index) > 0 and len(self.docmap) > 0 and len(self.term_frequency) > 0:
             return
-        if not os.path.exists(self.__cacheLocation):
+        if not os.path.exists(constants.CACHE_FOLDER):
             raise FileNotFoundError()
-        with open(self.__indexFile, "rb") as f:
+        with open(constants.INDEX_FILE, "rb") as f:
             self.index = load(f)
             f.close()
-        with open(self.__docMapFile, "rb") as f:
+        with open(constants.DOCUMENT_OBJ_FILE, "rb") as f:
             self.docmap = load(f)
             f.close()
-        with open(self.__termFrequency, "rb") as f:
+        with open(constants.TERM_FREQUENCY_FILE, "rb") as f:
             self.term_frequency = load(f)
             f.close()
-        with open(self.__docLengthFile, "rb") as f:
+        with open(constants.DOC_LENGTH_FILE, "rb") as f:
             self.doc_lengths = load(f)
             f.close()
     
