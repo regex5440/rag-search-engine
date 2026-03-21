@@ -5,6 +5,8 @@ DOCUMENT_OBJ_FILE = path.join(CACHE_FOLDER, "docmap.pkl")
 TERM_FREQUENCY_FILE = path.join(CACHE_FOLDER, "term_frequencies.pkl")
 DOC_LENGTH_FILE = path.join(CACHE_FOLDER, "doc_lengths.pkl")
 MOVIE_EMBEDDINGS_FILE = path.join(CACHE_FOLDER, "movie_embeddings.npy")
+SEMANTIC_MOVIE_EMBEDDINGS_FILE = path.join(CACHE_FOLDER, "chunk_embeddings.npy")
+SEMANTIC_CHUNK_METADATA_FILE = path.join(CACHE_FOLDER, "chunk_metadata.json")
 
 MOVIES_DATA_FILE = path.join("data", "movies.json")
 

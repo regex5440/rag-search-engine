@@ -54,4 +54,20 @@ def semanticSearchParser():
     search.add_argument("query", type=str, help="mandatory search query for semantic search")
     search.add_argument("--limit", type=int, default=5, help="Limit the search results, default 5")
 
+    chunk = subparsers.add_parser("chunk", help="Chunk the text for optimized embeddings")
+    chunk.add_argument("text", type=str, help="Text to be chunked")
+    chunk.add_argument("--chunk-size", type=int, default=200, help="Define the chunk as word counts per chunk")
+    chunk.add_argument("--overlap", type=int, default=0, help="Overlap the chunks")
+
+    semantic_chunk = subparsers.add_parser("semantic_chunk" ,help="Perform semantic chunking for optimized embeddings")
+    semantic_chunk.add_argument("text", type=str, help="Text to be chunked")
+    semantic_chunk.add_argument("--max-chunk-size", type=int, default=4, help="Maximum chunk size as number of words")
+    semantic_chunk.add_argument("--overlap", default=0, type=int, help="Overlap the chunks by number of words")
+
+    subparsers.add_parser("embed_chunks", help="Perform the semantic chunking of dataset")
+
+    search = subparsers.add_parser("search_chunked", help="Perform the search based on semantic embeddings")
+    search.add_argument("query", type=str)
+    search.add_argument("--limit", type=int, default=5)
+
     return parser
