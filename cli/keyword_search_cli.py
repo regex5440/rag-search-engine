@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-import json
 import helpers
-from inverted_index import InvertedIndex
+from cli.lib.inverted_index import InvertedIndex
 from math import log
 import cmd_parser
-from constants import MOVIES_DATA_FILE
 
 def main() -> None:
     parser = cmd_parser.attachParser()
@@ -12,10 +10,7 @@ def main() -> None:
     
     helpers.loadSaveWords()
     idx = InvertedIndex()
-    data = {}
-    with open(MOVIES_DATA_FILE) as f:
-        data = json.load(fp=f)
-        f.close()
+
     match args.command:
         case "search":
             qTokens = helpers.tokenizeSearchTerm(args.query)
@@ -39,7 +34,7 @@ def main() -> None:
                 movie = idx.docmap[id]
                 print(f'{id} {movie["title"]}')
         case "build":
-            idx.build(data["movies"])
+            idx.build()
             idx.save()
         
         case "tf":

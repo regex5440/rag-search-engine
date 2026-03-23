@@ -1,6 +1,6 @@
 from pickle import dump, load
 import os
-from helpers import tokenizeSearchTerm
+from helpers import tokenizeSearchTerm, loadMovies
 from collections import Counter
 from math import log
 import constants
@@ -41,7 +41,8 @@ class InvertedIndex():
         
         return sorted(self.index[token])
     
-    def build(self, moviesList):
+    def build(self):
+        moviesList = loadMovies()
         for m in moviesList:
             id = m["id"]
             self.docmap[id] = m

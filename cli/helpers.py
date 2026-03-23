@@ -1,5 +1,7 @@
 from nltk.stem import PorterStemmer
 from string import punctuation
+from constants import MOVIES_DATA_FILE
+import json
 
 translationTable = str.maketrans("", "", punctuation)
 
@@ -34,3 +36,8 @@ def tokenizeSearchTerm(q):
         queryTokens[i] = stemmer.stem(queryTokens[i])
 
     return queryTokens
+
+def loadMovies():
+    with open(MOVIES_DATA_FILE) as f:
+        docs = json.load(f)
+        return docs["movies"]
