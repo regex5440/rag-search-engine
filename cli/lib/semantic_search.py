@@ -63,6 +63,7 @@ class SemanticSearch:
         results = []
         for (score, doc) in sorted(matchingScore, reverse=True, key= lambda x: x[0])[:limit]:
             results.append({
+                "id": doc["id"],
                 "score": score,
                 "title": doc["title"],
                 "description": doc["description"]
