@@ -67,7 +67,7 @@ class ChunkedSemanticSearch(sse.SemanticSearch):
         movieScoreMap = {}
         if self.chunk_embeddings is None or self.chunk_metadata is None:
             print("chunk cache embedding or metadata not loaded!")
-            return
+            return []
         for i, chEmb in enumerate(self.chunk_embeddings):
             score = sse.cosine_similarity(chEmb, qEmb)
             metadata = self.chunk_metadata[i]

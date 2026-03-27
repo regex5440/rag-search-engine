@@ -71,3 +71,21 @@ def semanticSearchParser():
     search.add_argument("--limit", type=int, default=5)
 
     return parser
+
+def hybridSearchParser():
+    parser = argparse.ArgumentParser(description="Hybrid Search CLI")
+    sp = parser.add_subparsers(dest="command", help="Available commands")
+    nrmlz = sp.add_parser("normalize", help="Normalize the BM25 score list to Semantic's Cosine level")
+    nrmlz.add_argument("list", nargs="+", type=float, help="sequence of numbers separated with whitespace")
+
+    ws = sp.add_parser("weighted-search", help="Search based on hybrid search")
+    ws.add_argument("query", type=str, help="Mandatory query")
+    ws.add_argument("--alpha", type=float, default=0.5, help="Set the weight of keyword/semantic search")
+    ws.add_argument("--limit", type=int, default=5, help="Limit the search results")
+
+    rrfsearch = sp.add_parser("rrf-search", help="Perform Reciprocal Rank Fusion")
+    rrfsearch.add_argument("query", type=str, help="Mandatory query to search against")
+    rrfsearch.add_argument("-k", default=60, type=int, help="Set the K parameter")
+    rrfsearch.add_argument("--limit", default=5, type=int, help="Limit the search results")
+
+    return parser
