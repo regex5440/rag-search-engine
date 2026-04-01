@@ -87,5 +87,7 @@ def hybridSearchParser():
     rrfsearch.add_argument("query", type=str, help="Mandatory query to search against")
     rrfsearch.add_argument("-k", default=60, type=int, help="Set the K parameter")
     rrfsearch.add_argument("--limit", default=5, type=int, help="Limit the search results")
+    rrfsearch.add_argument("--enhance", type=str, choices=["spell", "rewrite", "expand"], help="Enhance user query with LLM")
+    rrfsearch.add_argument("--rerank-method", type=str, choices=["individual", "batch", "cross_encoder"], help="Enhance results with LLM based re-ranking")
 
     return parser

@@ -72,7 +72,7 @@ class HybridSearch:
 
             doc = self.idx.docmap[docId]
             resultMap[docId]["title"] = doc["title"]
-            resultMap[docId]["desc"] = doc["description"][:100]
+            resultMap[docId]["desc"] = doc["description"]
             resultMap[docId]["rrf"] += calculate_rrf(i+1, k)
             resultMap[docId]["bm25_score"] = score
         
