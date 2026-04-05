@@ -86,7 +86,7 @@ class ChunkedSemanticSearch(sse.SemanticSearch):
             results.append({
                 "id": movie["id"],
                 "title": movie["title"],
-                "document": movie["description"][:100],
+                "document": movie["description"],
                 "score": round(score,2),
                 "metadata": {}
             })

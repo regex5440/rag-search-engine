@@ -9,6 +9,9 @@ class LLM:
         GEMINI_API_KEY = environ.get("GEMINI_API_KEY")
         self.client = genai.Client(api_key=GEMINI_API_KEY)
         self.MODEL = "gemma-3-27b-it"
+    
+    def raw_generation(self, prompt: str):
+        return self.client.models.generate_content(model=self.MODEL,contents=prompt)
 
     def enhanceQuery(self, query: str, command: str) -> str:
         prompt = ""
