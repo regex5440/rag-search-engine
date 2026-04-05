@@ -92,7 +92,10 @@ class InvertedIndex():
         if len(tokens) > 1:
             raise Exception("only single term can be used")
         N = len(self.docmap)
-        df = len(self.index[tokens[0]])
+        token = tokens[0]
+        if token not in self.index:
+            return 0.0
+        df = len(self.index[token])
         return log((N - df + 0.5)/(df + 0.5) + 1)
 
     def get_bm25_tf(self, doc_id, term, k1=constants.BM25_K1, length_normalization_factor=constants.BM25_B):
@@ -123,7 +126,7 @@ class InvertedIndex():
             return []
         
         matchingDocs = {}
-
+        print("Tokenize query", tokens)
         for token in tokens:
             for doc_id in self.index.get(token, []):
                 if doc_id not in matchingDocs:

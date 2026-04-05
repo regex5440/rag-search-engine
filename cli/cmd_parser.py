@@ -89,5 +89,17 @@ def hybridSearchParser():
     rrfsearch.add_argument("--limit", default=5, type=int, help="Limit the search results")
     rrfsearch.add_argument("--enhance", type=str, choices=["spell", "rewrite", "expand"], help="Enhance user query with LLM")
     rrfsearch.add_argument("--rerank-method", type=str, choices=["individual", "batch", "cross_encoder"], help="Enhance results with LLM based re-ranking")
+    rrfsearch.add_argument("--evaluate", action="store_true", help="Manually evaluate the RRF results")
 
+    return parser
+
+
+def evaluationParser():
+    parser = argparse.ArgumentParser(description="Search Evaluation CLI")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=5,
+        help="Number of results to evaluate (k for precision@k, recall@k)",
+    )
     return parser

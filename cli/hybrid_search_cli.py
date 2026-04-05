@@ -37,6 +37,7 @@ def main() -> None:
         case "rrf-search":
             isEnhanced = args.enhance is not None
             reRankingEnabled = args.rerank_method is not None
+            shouldEvaluate = args.evaluate
             llm = LLM()
 
             query = args.query
@@ -83,7 +84,9 @@ def main() -> None:
                 desc = r["desc"][:100]
                 rrf = r["rrf"]
                 bm = r["bm25_score"]
-                score = r["rerank_score"]
+                score = 0
+                if "rerank_score" in r:
+                    score = r["rerank_score"]
                 semantic = r["semantic_score"]
                 if args.rerank_method == "individual":
                     print(f"\n{i+1}. {title}\nRe-rank Score: {score}/10\nRRF Score: {rrf:.3f}\nBM25 Rank: {bm}, Semantic Rank: {semantic}\n{desc}")
@@ -91,6 +94,14 @@ def main() -> None:
                     print(f"\n{i+1}. {title}\nRe-rank Score: {len(results) - score + 2}\nRRF Score: {rrf:.3f}\nBM25 Rank: {bm}, Semantic Rank: {semantic}\n{desc}")
                 elif args.rerank_method == "cross_encoder":
                     print(f"\n{i+1}. {title}\nCross Encoder Score: {score:.3f}\nRRF Score: {rrf:.3f}\nBM25 Rank: {bm}, Semantic Rank: {semantic}\n{desc}")
+            
+            if shouldEvaluate:
+                formatted = [f'\n-> Title: {r.get("title", "")}\nDesc:{r.get("desc", "")}\n' for r in results]
+                scores = llm.evaluationScores(query, formatted)
+                for i, r in enumerate(results[:requestedLimit]):
+                    score = scores[i]
+                    title = r["title"]
+                    print(f"{i+1}. {title}: {score}/3")
 
         case _:
             parser.print_help()

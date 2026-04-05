@@ -59,9 +59,12 @@ class HybridSearch:
 
 
     def rrf_search(self, query, k, limit=10):
+        print("Original Query", query)
         bm25Results = self._bm25_search(query, limit * 500)
         semanticResults = self.semantic_search.search_chunks(query, limit * 500)
 
+        print("BM25 Results", bm25Results)
+        print("Semantic Results", semanticResults)
         resultMap: dict[int, dict] = {}
         for i, (docId, score) in enumerate(bm25Results):
             if docId not in resultMap:
@@ -88,7 +91,7 @@ class HybridSearch:
             resultMap[docId]["desc"] = data["document"]
             resultMap[docId]["rrf"] += calculate_rrf(i+1, k)
             resultMap[docId]["semantic_score"] = data["score"]
-        
+        print("RRF Results", resultMap)
         return sorted(resultMap.values(), key= lambda x: x["rrf"], reverse=True)[:limit]
 
 

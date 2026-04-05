@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import helpers
-from cli.lib.inverted_index import InvertedIndex
+from lib.inverted_index import InvertedIndex
 from math import log
 import cmd_parser
 

@@ -9,7 +9,7 @@ SEMANTIC_MOVIE_EMBEDDINGS_FILE = path.join(CACHE_FOLDER, "chunk_embeddings.npy")
 SEMANTIC_CHUNK_METADATA_FILE = path.join(CACHE_FOLDER, "chunk_metadata.json")
 
 MOVIES_DATA_FILE = path.join("data", "movies.json")
-
+GOLDEN_DATASET = path.join("data", "golden_dataset.json")
 
 BM25_K1 = 1.5
 BM25_B = 0.75
