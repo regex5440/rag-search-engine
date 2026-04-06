@@ -12,6 +12,25 @@ class LLM:
     
     def raw_generation(self, prompt: str):
         return self.client.models.generate_content(model=self.MODEL,contents=prompt)
+    
+    def describe_image(self, image, mime, query):
+        prompt = """Given the included image and text query, rewrite the text query to improve search results from a movie database. Make sure to:
+- Synthesize visual and textual information
+- Focus on movie-specific details (actors, scenes, style, etc.)
+- Return only the rewritten query, without any additional commentary"""
+        parts = [
+            prompt,
+            genai.types.Part.from_bytes(data=image, mime_type=mime),
+            query,
+        ]
+
+        response = self.client.models.generate_content(model=self.MODEL, contents=parts)
+        if response.text is None:
+            print("Unable to generate content")
+            return
+        print(f"Rewritten query: {response.text.strip()}")
+        if response.usage_metadata is not None:
+            print(f"Total tokens:    {response.usage_metadata.total_token_count}")
 
     def enhanceQuery(self, query: str, command: str) -> str:
         prompt = ""
